@@ -33,7 +33,7 @@ import javafx.geometry.HPos;
 import static java.lang.Math.sqrt;
 
 public class Main extends Application {
-    double lighty = 6.0;
+    double lighty = 7.0;
     Sphere sphere;
 
     public void start(Stage stage) throws FileNotFoundException {
@@ -52,8 +52,10 @@ public class Main extends Application {
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
-
-
+        //rgb sliders
+        Slider r_slider = new Slider(0, 1, sphere.color.getRed());
+        Slider g_slider = new Slider(0, 1, sphere.color.getGreen());
+        Slider b_slider = new Slider(0, 1, sphere.color.getBlue());
 
         // Add ChangeListeners for each slider
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -66,7 +68,6 @@ public class Main extends Application {
                 view.setImage(image);
             }
         });
-
         y_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
@@ -77,7 +78,6 @@ public class Main extends Application {
                 view.setImage(image);
             }
         });
-
         z_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
@@ -88,6 +88,45 @@ public class Main extends Application {
                 view.setImage(image);
             }
         });
+        r_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the color of the sphere
+                sphere.color = Color.color(newValue.doubleValue(), sphere.color.getGreen(), sphere.color.getBlue());
+                // Render the image again
+                Render(image);
+                // Update the ImageView
+                view.setImage(image);
+            }
+        });
+
+        g_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the color of the sphere
+                sphere.color = Color.color(sphere.color.getRed(), newValue.doubleValue(), sphere.color.getBlue());
+                // Render the image again
+                Render(image);
+                // Update the ImageView
+                view.setImage(image);
+            }
+        });
+        b_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the color of the sphere
+                sphere.color = Color.color(sphere.color.getRed(), sphere.color.getGreen(), newValue.doubleValue());
+                // Render the image again
+                Render(image);
+                // Update the ImageView
+                view.setImage(image);
+            }
+        });
+        //make a hbox to hold the RGB sliders
+        HBox rgbSliderBox = new HBox();
+        rgbSliderBox.setSpacing(10);
+        rgbSliderBox.getChildren().addAll(
+              new Label("R"), r_slider,
+              new Label("G"), g_slider,
+              new Label("B"), b_slider
+        );
 
         // Create HBox to hold x, y, and z sliders
         HBox sliderBox = new HBox();
@@ -102,8 +141,14 @@ public class Main extends Application {
         GridPane root = new GridPane();
         root.setVgap(16);
         root.setHgap(4);
+
+        GridPane.setRowIndex(view, 0);
         GridPane.setRowIndex(sliderBox, 1);
         root.getChildren().addAll(view, sliderBox);
+        //add gridpane for the RGB sliders
+        GridPane.setRowIndex(rgbSliderBox, 2);
+        GridPane.setColumnIndex(rgbSliderBox, 0);
+        root.getChildren().add(rgbSliderBox);
 
         // Create a Scene and show it
         Scene scene = new Scene(root, 640, 640);
@@ -131,9 +176,6 @@ public class Main extends Application {
             return direction;
         }
     }
-
-
-
 
     public void Render(WritableImage image) {
         // Get image dimensions, and declare loop variables
