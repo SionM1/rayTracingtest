@@ -33,7 +33,7 @@ import javafx.geometry.HPos;
 import static java.lang.Math.sqrt;
 
 public class Main extends Application {
-    double lighty = 7.0;
+    double lighty = 10;
     Sphere sphere;
 
     public void start(Stage stage) throws FileNotFoundException {
@@ -56,6 +56,15 @@ public class Main extends Application {
         Slider r_slider = new Slider(0, 1, sphere.color.getRed());
         Slider g_slider = new Slider(0, 1, sphere.color.getGreen());
         Slider b_slider = new Slider(0, 1, sphere.color.getBlue());
+
+        //print out xyz coordinates when clicking on screen into terminal
+
+        view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+            System.out.println(event.getX() + " " + event.getY());
+            event.consume();
+            Render(image);
+        });
+
 
         // Add ChangeListeners for each slider
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
