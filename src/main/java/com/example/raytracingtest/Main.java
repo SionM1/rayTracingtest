@@ -25,6 +25,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.nio.channels.SeekableByteChannel;
 import java.util.ArrayList;
 import java.io.*;
 import java.lang.Math.*;
@@ -34,7 +36,9 @@ import static java.lang.Math.sqrt;
 
 public class Main extends Application {
     double lighty = 10;
-    Sphere sphere;
+    ArrayList<Sphere> spheres;
+    Sphere selectedSphere;
+
 
     public void start(Stage stage) throws FileNotFoundException {
         stage.setTitle("Sphere!");
@@ -42,7 +46,9 @@ public class Main extends Application {
         int Height = 500;
 
         // Create an instance of Sphere
-        sphere = new Sphere(new Vector(0, 0, -100), 50, Color.RED);
+        spheres = new ArrayList<>();
+        spheres.add(new Sphere(new Vector(0, 0, -100), 50, Color.RED));
+        spheres.add(new Sphere(new Vector(-100, 0, -100), 50, Color.BLUE));
 
         // Create an image and an ImageView to display it
         WritableImage image = new WritableImage(Width, Height);
@@ -52,10 +58,30 @@ public class Main extends Application {
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
+
+        //add vbox into render
+        VBox vbox = new VBox();
+        vbox.setSpacing(3);
+       //Toggle group for Radio button
+        ToggleGroup group = new ToggleGroup();
+       //create radio button
+        for (int i = 0; i < spheres.size(); i++) {
+            RadioButton rb = new RadioButton("Sphere " + (i + 1));
+            rb.setToggleGroup(group);
+            rb.setUserData(spheres.get(i));
+            vbox.getChildren().add(rb); // add RadioButton to the VBox
+        }
+        //add vbox into render
+
+       //setting the first sphere as the selected sphere
+        group.selectToggle(group.getToggles().get(0));
+        selectedSphere = (Sphere) group.getSelectedToggle().getUserData();
+
         //rgb sliders
-        Slider r_slider = new Slider(0, 1, sphere.color.getRed());
-        Slider g_slider = new Slider(0, 1, sphere.color.getGreen());
-        Slider b_slider = new Slider(0, 1, sphere.color.getBlue());
+        Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
+        Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
+        Slider b_slider = new Slider(0, 1, selectedSphere.color.getBlue());
+
 
         //print out xyz coordinates when clicking on screen into terminal
 
@@ -70,7 +96,7 @@ public class Main extends Application {
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                sphere.center.x = newValue.doubleValue();
+                selectedSphere.center.x = newValue.doubleValue();
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -80,7 +106,7 @@ public class Main extends Application {
         y_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                sphere.center.y = newValue.doubleValue();
+                selectedSphere.center.y = newValue.doubleValue();
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -90,7 +116,7 @@ public class Main extends Application {
         z_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                sphere.center.z = newValue.doubleValue();
+                selectedSphere.center.z = newValue.doubleValue();
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -100,7 +126,7 @@ public class Main extends Application {
         r_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                sphere.color = Color.color(newValue.doubleValue(), sphere.color.getGreen(), sphere.color.getBlue());
+                selectedSphere.color = Color.color(newValue.doubleValue(), selectedSphere.color.getGreen(), selectedSphere.color.getBlue());
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -111,7 +137,7 @@ public class Main extends Application {
         g_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                sphere.color = Color.color(sphere.color.getRed(), newValue.doubleValue(), sphere.color.getBlue());
+                selectedSphere.color = Color.color(selectedSphere.color.getRed(), newValue.doubleValue(), selectedSphere.color.getBlue());
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -121,7 +147,7 @@ public class Main extends Application {
         b_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                sphere.color = Color.color(sphere.color.getRed(), sphere.color.getGreen(), newValue.doubleValue());
+                selectedSphere.color = Color.color(selectedSphere.color.getRed(), selectedSphere.color.getGreen(), newValue.doubleValue());
                 // Render the image again
                 Render(image);
                 // Update the ImageView
@@ -158,6 +184,8 @@ public class Main extends Application {
         GridPane.setRowIndex(rgbSliderBox, 2);
         GridPane.setColumnIndex(rgbSliderBox, 0);
         root.getChildren().add(rgbSliderBox);
+        root.add(vbox, 3, 0, 1, 3);
+
 
         // Create a Scene and show it
         Scene scene = new Scene(root, 640, 640);
@@ -203,7 +231,7 @@ public class Main extends Application {
                 Sphere.Intersection closest = null;
                 double closestDistance = Double.POSITIVE_INFINITY;
                 Sphere.Intersection current;
-                current = sphere.intersect(ray);
+                current = selectedSphere.intersect(ray);
                 if (current != null) {
                     double distance = current.getPoint().sub(camera).magnitude();
                     if (distance < closestDistance) {
@@ -219,7 +247,7 @@ public class Main extends Application {
                     double lightDist = light.sub(point).magnitude();
                     Ray shadowRay = new Ray(point, lightDir);
                     boolean inShadow = false;
-                    Sphere.Intersection shadowIntersect = sphere.intersect(shadowRay);
+                    Sphere.Intersection shadowIntersect = selectedSphere.intersect(shadowRay);
                     if (shadowIntersect != null) {
                         double shadowDistance = shadowIntersect.getPoint().sub(point).magnitude();
                         if (shadowDistance < lightDist) {
@@ -227,7 +255,7 @@ public class Main extends Application {
                         }
                     }
                     double brightness = Math.max(0, normal.dot(lightDir)) * (inShadow ? 0.5 : 1);
-                    Color col = sphere.getColor().deriveColor(0, 1, brightness, 1);
+                    Color col = selectedSphere.getColor().deriveColor(0, 1, brightness, 1);
                     image_writer.setColor(i, j, col);
                 } else {
                     image_writer.setColor(i, j, Color.BLACK);
