@@ -47,8 +47,8 @@ public class Main extends Application {
 
         // Create an instance of Sphere
         spheres = new ArrayList<>();
-        spheres.add(new Sphere(new Vector(0, 0, -100), 50, Color.RED));
-        spheres.add(new Sphere(new Vector(-100, 0, -100), 50, Color.BLUE));
+        spheres.add(new Sphere(new Vector(0, 0, -100), 25, Color.RED));
+        spheres.add(new Sphere(new Vector(-50, 0, -100), 25, Color.BLUE));
 
         // Create an image and an ImageView to display it
         WritableImage image = new WritableImage(Width, Height);
@@ -74,7 +74,7 @@ public class Main extends Application {
         //add vbox into render
 
        //setting the first sphere as the selected sphere
-        group.selectToggle(group.getToggles().get(0));
+        group.selectToggle(group.getToggles().get(1));
         selectedSphere = (Sphere) group.getSelectedToggle().getUserData();
 
         //rgb sliders
@@ -213,7 +213,6 @@ public class Main extends Application {
             return direction;
         }
     }
-
     public void Render(WritableImage image) {
         // Get image dimensions, and declare loop variables
         int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
@@ -221,6 +220,7 @@ public class Main extends Application {
 
         Vector camera = new Vector(0, 0, -200);
         Vector light = new Vector(250, 250, -100 * lighty);
+
 
 
         for (j = 0; j < h; j++) {
@@ -264,4 +264,4 @@ public class Main extends Application {
         }
     }
 
-}
+    }
