@@ -30,6 +30,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.ArrayList;
 import java.io.*;
 import java.lang.Math.*;
+import java.util.List;
+
 import javafx.geometry.HPos;
 
 import static java.lang.Math.sqrt;
@@ -62,9 +64,9 @@ public class Main extends Application {
         //add vbox into render
         VBox vbox = new VBox();
         vbox.setSpacing(3);
-       //Toggle group for Radio button
+        //Toggle group for Radio button
         ToggleGroup group = new ToggleGroup();
-       //create radio button
+        //create radio button
         for (int i = 0; i < spheres.size(); i++) {
             RadioButton rb = new RadioButton("Sphere " + (i + 1));
             rb.setToggleGroup(group);
@@ -73,8 +75,8 @@ public class Main extends Application {
         }
         //add vbox into render
 
-       //setting the first sphere as the selected sphere
-        group.selectToggle(group.getToggles().get(1));
+        //setting the first sphere as the selected sphere
+        group.selectToggle(group.getToggles().get(0));
         selectedSphere = (Sphere) group.getSelectedToggle().getUserData();
 
         //rgb sliders
@@ -158,9 +160,9 @@ public class Main extends Application {
         HBox rgbSliderBox = new HBox();
         rgbSliderBox.setSpacing(10);
         rgbSliderBox.getChildren().addAll(
-              new Label("R"), r_slider,
-              new Label("G"), g_slider,
-              new Label("B"), b_slider
+                new Label("R"), r_slider,
+                new Label("G"), g_slider,
+                new Label("B"), b_slider
         );
 
         // Create HBox to hold x, y, and z sliders
@@ -221,41 +223,48 @@ public class Main extends Application {
         Vector camera = new Vector(0, 0, -200);
         Vector light = new Vector(250, 250, -100 * lighty);
 
-
-
         for (j = 0; j < h; j++) {
             for (i = 0; i < w; i++) {
                 Vector direction = new Vector(i - w / 2, j - h / 2, 0).sub(camera);
                 direction.normalise();
-                Ray ray = new Ray(camera, direction);
+                Main.Ray ray = new Main.Ray(camera, direction);
+
                 Sphere.Intersection closest = null;
                 double closestDistance = Double.POSITIVE_INFINITY;
-                Sphere.Intersection current;
-                current = selectedSphere.intersect(ray);
-                if (current != null) {
-                    double distance = current.getPoint().sub(camera).magnitude();
-                    if (distance < closestDistance) {
-                        closest = current;
-                        closestDistance = distance;
+
+                for (Sphere sphere : spheres) {
+                    Sphere.Intersection current = sphere.intersect(ray);
+                    if (current != null) {
+                        double distance = current.getPoint().sub(camera).magnitude();
+                        if (distance < closestDistance) {
+                            closest = current;
+                            closestDistance = distance;
+                        }
                     }
                 }
+
                 if (closest != null) {
                     Vector point = closest.getPoint();
                     Vector normal = closest.getNormal();
                     Vector lightDir = light.sub(point);
                     lightDir.normalise();
                     double lightDist = light.sub(point).magnitude();
-                    Ray shadowRay = new Ray(point, lightDir);
+                    Main.Ray shadowRay = new Main.Ray(point, lightDir);
                     boolean inShadow = false;
-                    Sphere.Intersection shadowIntersect = selectedSphere.intersect(shadowRay);
-                    if (shadowIntersect != null) {
-                        double shadowDistance = shadowIntersect.getPoint().sub(point).magnitude();
-                        if (shadowDistance < lightDist) {
-                            inShadow = true;
+
+                    for (Sphere sphere : spheres) {
+                        Sphere.Intersection shadowIntersect = sphere.intersect(shadowRay);
+                        if (shadowIntersect != null) {
+                            double shadowDistance = shadowIntersect.getPoint().sub(point).magnitude();
+                            if (shadowDistance < lightDist) {
+                                inShadow = true;
+                                break;
+                            }
                         }
                     }
+
                     double brightness = Math.max(0, normal.dot(lightDir)) * (inShadow ? 0.5 : 1);
-                    Color col = selectedSphere.getColor().deriveColor(0, 1, brightness, 1);
+                    Color col = closest.getColor().deriveColor(0, 1, brightness, 1);
                     image_writer.setColor(i, j, col);
                 } else {
                     image_writer.setColor(i, j, Color.BLACK);
@@ -263,5 +272,5 @@ public class Main extends Application {
             }
         }
     }
-
     }
+
