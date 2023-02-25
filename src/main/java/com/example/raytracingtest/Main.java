@@ -41,7 +41,6 @@ public class Main extends Application {
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
 
-
     public void start(Stage stage) throws FileNotFoundException {
         stage.setTitle("Sphere!");
         int Width = 500;
@@ -50,7 +49,11 @@ public class Main extends Application {
         // Create an instance of Sphere
         spheres = new ArrayList<>();
         spheres.add(new Sphere(new Vector(0, 0, -100), 25, Color.RED));
-        spheres.add(new Sphere(new Vector(-50, 0, -100), 25, Color.BLUE));
+        spheres.add(new Sphere(new Vector(-55, 0, -100), 25, Color.BLUE));
+        spheres.add(new Sphere(new Vector(55, 0, -100), 25, Color.GREEN));
+        //select the first sphere
+        selectedSphere = spheres.get(0);
+
 
         // Create an image and an ImageView to display it
         WritableImage image = new WritableImage(Width, Height);
@@ -60,6 +63,11 @@ public class Main extends Application {
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
+
+        //rgb sliders
+        Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
+        Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
+        Slider b_slider = new Slider(0, 1, selectedSphere.color.getBlue());
 
         //add vbox into render
         VBox vbox = new VBox();
@@ -73,16 +81,22 @@ public class Main extends Application {
             rb.setUserData(spheres.get(i));
             vbox.getChildren().add(rb); // add RadioButton to the VBox
         }
-        //add vbox into render
-
         //setting the first sphere as the selected sphere
-        group.selectToggle(group.getToggles().get(0));
-        selectedSphere = (Sphere) group.getSelectedToggle().getUserData();
 
-        //rgb sliders
-        Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
-        Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
-        Slider b_slider = new Slider(0, 1, selectedSphere.color.getBlue());
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+                // Update the selected sphere
+                selectedSphere = (Sphere) newValue.getUserData();
+
+                // Update the XYZ and RGB sliders to show the selected sphere's properties
+                x_slider.setValue(selectedSphere.center.x);
+                y_slider.setValue(selectedSphere.center.y);
+                z_slider.setValue(selectedSphere.center.z);
+                r_slider.setValue(selectedSphere.color.getRed());
+                g_slider.setValue(selectedSphere.color.getGreen());
+                b_slider.setValue(selectedSphere.color.getBlue());
+            }
+        });
 
 
         //print out xyz coordinates when clicking on screen into terminal
@@ -98,62 +112,76 @@ public class Main extends Application {
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                selectedSphere.center.x = newValue.doubleValue();
+               if (selectedSphere != null)
+                   selectedSphere.center.x = newValue.doubleValue();
                 // Render the image again
                 Render(image);
                 // Update the ImageView
                 view.setImage(image);
             }
+
         });
         y_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                selectedSphere.center.y = newValue.doubleValue();
-                // Render the image again
-                Render(image);
-                // Update the ImageView
-                view.setImage(image);
+                if (selectedSphere != null) {
+                    selectedSphere.center.y = newValue.doubleValue();
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+
+                }
             }
+
         });
         z_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the position of the sphere
-                selectedSphere.center.z = newValue.doubleValue();
-                // Render the image again
-                Render(image);
-                // Update the ImageView
-                view.setImage(image);
+                if (selectedSphere != null) {
+                    selectedSphere.center.z = newValue.doubleValue();
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+                }
             }
         });
         r_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                selectedSphere.color = Color.color(newValue.doubleValue(), selectedSphere.color.getGreen(), selectedSphere.color.getBlue());
-                // Render the image again
-                Render(image);
-                // Update the ImageView
-                view.setImage(image);
+                if (selectedSphere != null) {
+                    selectedSphere.color = Color.color(newValue.doubleValue(), selectedSphere.color.getGreen(), selectedSphere.color.getBlue());
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+                }
             }
         });
 
         g_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                selectedSphere.color = Color.color(selectedSphere.color.getRed(), newValue.doubleValue(), selectedSphere.color.getBlue());
-                // Render the image again
-                Render(image);
-                // Update the ImageView
-                view.setImage(image);
+                if (selectedSphere != null) {
+                    selectedSphere.color = Color.color(selectedSphere.color.getRed(), newValue.doubleValue(), selectedSphere.color.getBlue());
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+                }
             }
         });
         b_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
-                selectedSphere.color = Color.color(selectedSphere.color.getRed(), selectedSphere.color.getGreen(), newValue.doubleValue());
-                // Render the image again
-                Render(image);
-                // Update the ImageView
-                view.setImage(image);
+                if (selectedSphere != null) {
+                    selectedSphere.color = Color.color(selectedSphere.color.getRed(), selectedSphere.color.getGreen(), newValue.doubleValue());
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+                }
             }
         });
         //make a hbox to hold the RGB sliders
