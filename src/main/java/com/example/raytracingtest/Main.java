@@ -40,6 +40,14 @@ public class Main extends Application {
     double lighty = 10;
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
+    //slider objects handler
+    public static void setSliderTickLabels(Slider slider) {
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(10);
+        slider.setMinorTickCount(0);
+
+    }
 
     public void start(Stage stage) throws FileNotFoundException {
         stage.setTitle("Sphere!");
@@ -48,9 +56,11 @@ public class Main extends Application {
 
         // Create an instance of Sphere
         spheres = new ArrayList<>();
-        spheres.add(new Sphere(new Vector(0, 0, -100), 25, Color.RED));
+        spheres.add(new Sphere(new Vector(0, -55, -100), 25, Color.RED));
         spheres.add(new Sphere(new Vector(-55, 0, -100), 25, Color.BLUE));
         spheres.add(new Sphere(new Vector(55, 0, -100), 25, Color.GREEN));
+        spheres.add(new Sphere(new Vector(0, 55, -100), 25, Color.ORANGE));
+
         //select the first sphere
         selectedSphere = spheres.get(0);
 
@@ -59,15 +69,24 @@ public class Main extends Application {
         WritableImage image = new WritableImage(Width, Height);
         ImageView view = new ImageView(image);
 
+
         //sliders for x, y, and z positions
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
-
+        //setting the tick labels on the sliders
+        setSliderTickLabels(x_slider);
+        setSliderTickLabels(y_slider);
+        setSliderTickLabels(z_slider);
         //rgb sliders
         Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
         Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
         Slider b_slider = new Slider(0, 1, selectedSphere.color.getBlue());
+        //setting the tick labels on the sliders
+        setSliderTickLabels(r_slider);
+        setSliderTickLabels(g_slider);
+        setSliderTickLabels(b_slider);
+        //increase radius slider
 
         //add vbox into render
         VBox vbox = new VBox();
@@ -81,8 +100,6 @@ public class Main extends Application {
             rb.setUserData(spheres.get(i));
             vbox.getChildren().add(rb); // add RadioButton to the VBox
         }
-        //setting the first sphere as the selected sphere
-
         group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 // Update the selected sphere
@@ -218,7 +235,7 @@ public class Main extends Application {
 
 
         // Create a Scene and show it
-        Scene scene = new Scene(root, 640, 640);
+        Scene scene = new Scene(root, 1000, 640);
         stage.setScene(scene);
         stage.show();
 
@@ -295,7 +312,7 @@ public class Main extends Application {
                     Color col = closest.getColor().deriveColor(0, 1, brightness, 1);
                     image_writer.setColor(i, j, col);
                 } else {
-                    image_writer.setColor(i, j, Color.BLACK);
+                    image_writer.setColor(i, j, Color.GRAY);
                 }
             }
         }
