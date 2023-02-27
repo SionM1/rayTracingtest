@@ -40,13 +40,13 @@ public class Main extends Application {
     double lighty = 10;
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
+
     //slider objects handler
     public static void setSliderTickLabels(Slider slider) {
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.setMajorTickUnit(10);
         slider.setMinorTickCount(0);
-
     }
 
     public void start(Stage stage) throws FileNotFoundException {
@@ -64,29 +64,31 @@ public class Main extends Application {
         //select the first sphere
         selectedSphere = spheres.get(0);
 
-
         // Create an image and an ImageView to display it
         WritableImage image = new WritableImage(Width, Height);
         ImageView view = new ImageView(image);
 
 
-        //sliders for x, y, and z positions
+        //sliders for x, y, z and radius
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
+        Slider radius_slider = new Slider(-200, 100, 0);
+
         //setting the tick labels on the sliders
         setSliderTickLabels(x_slider);
         setSliderTickLabels(y_slider);
         setSliderTickLabels(z_slider);
+        setSliderTickLabels(radius_slider);
         //rgb sliders
         Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
         Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
         Slider b_slider = new Slider(0, 1, selectedSphere.color.getBlue());
+
         //setting the tick labels on the sliders
         setSliderTickLabels(r_slider);
         setSliderTickLabels(g_slider);
         setSliderTickLabels(b_slider);
-        //increase radius slider
 
         //add vbox into render
         VBox vbox = new VBox();
@@ -104,7 +106,6 @@ public class Main extends Application {
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 // Update the selected sphere
                 selectedSphere = (Sphere) newValue.getUserData();
-
                 // Update the XYZ and RGB sliders to show the selected sphere's properties
                 x_slider.setValue(selectedSphere.center.x);
                 y_slider.setValue(selectedSphere.center.y);
@@ -112,19 +113,15 @@ public class Main extends Application {
                 r_slider.setValue(selectedSphere.color.getRed());
                 g_slider.setValue(selectedSphere.color.getGreen());
                 b_slider.setValue(selectedSphere.color.getBlue());
+                radius_slider.setValue(selectedSphere.radius);
             }
         });
-
-
         //print out xyz coordinates when clicking on screen into terminal
-
         view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
             System.out.println(event.getX() + " " + event.getY());
             event.consume();
             Render(image);
         });
-
-
         // Add ChangeListeners for each slider
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -164,6 +161,20 @@ public class Main extends Application {
                 }
             }
         });
+
+        radius_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the position of the sphere
+                if (selectedSphere != null) {
+                    selectedSphere.radius = newValue.doubleValue();
+                    // Render the image again
+                    Render(image);
+                    // Update the ImageView
+                    view.setImage(image);
+                }
+            }
+        });
+
         r_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 // Update the color of the sphere
@@ -209,14 +220,14 @@ public class Main extends Application {
                 new Label("G"), g_slider,
                 new Label("B"), b_slider
         );
-
         // Create HBox to hold x, y, and z sliders
         HBox sliderBox = new HBox();
         sliderBox.setSpacing(10);
         sliderBox.getChildren().addAll(
                 new Label("X"), x_slider,
                 new Label("Y"), y_slider,
-                new Label("Z"), z_slider
+                new Label("Z"), z_slider,
+                new Label("Radius"), radius_slider
         );
 
         // Create a GridPane to hold the ImageView and sliders

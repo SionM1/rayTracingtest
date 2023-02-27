@@ -40,3 +40,5 @@ public class Vector {
         System.out.println("x=" + x + ", y=" + y + ", z=" + z);
     }
 }
+
+
