@@ -41,7 +41,7 @@ public class Main extends Application {
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
 
-    Camera camera = new Camera(new Vector(0, 0, 0), 0, 90);
+    Camera camera = new Camera(new Vector(0, 0, -200), 0, 0);
 
 
 
@@ -143,7 +143,7 @@ public class Main extends Application {
             //print out the X Y Z coordinates
             System.out.println(event.getX() + " " + event.getY());
             event.consume();
-            Render(image);
+            Render(image, camera);
         });
         // Add ChangeListeners for each slider
         x_slider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -152,7 +152,7 @@ public class Main extends Application {
                if (selectedSphere != null)
                    selectedSphere.center.x = newValue.doubleValue();
                 // Render the image again
-                Render(image);
+                Render(image, camera);
                 // Update the ImageView
                 view.setImage(image);
             }
@@ -164,7 +164,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.center.y = newValue.doubleValue();
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
 
@@ -178,7 +178,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.center.z = newValue.doubleValue();
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
                 }
@@ -191,7 +191,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.radius = newValue.doubleValue();
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
                 }
@@ -204,7 +204,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.color = Color.color(newValue.doubleValue(), selectedSphere.color.getGreen(), selectedSphere.color.getBlue());
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
                 }
@@ -217,7 +217,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.color = Color.color(selectedSphere.color.getRed(), newValue.doubleValue(), selectedSphere.color.getBlue());
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
                 }
@@ -229,7 +229,7 @@ public class Main extends Application {
                 if (selectedSphere != null) {
                     selectedSphere.color = Color.color(selectedSphere.color.getRed(), selectedSphere.color.getGreen(), newValue.doubleValue());
                     // Render the image again
-                    Render(image);
+                    Render(image, camera);
                     // Update the ImageView
                     view.setImage(image);
                 }
@@ -242,7 +242,7 @@ public class Main extends Application {
                 // Update the azimuth of the camera
                 camera.setAzimuth(newValue.doubleValue());
                 // Render the image again
-                Render(image);
+                Render(image, camera);
                 // Update the ImageView
                 view.setImage(image);
             }
@@ -253,9 +253,9 @@ public class Main extends Application {
                 // Update the altitude of the camera
                 camera.setAltitude(newValue.doubleValue());
                 // Render the image again
-                Render(image);
+                Render(image, camera);
                 // Update the ImageView
-                view.setImage(image);
+                view.setImage((image));
             }
         });
 
@@ -300,7 +300,7 @@ public class Main extends Application {
         stage.show();
 
         // Render the image initially
-        Render(image);
+        Render(image, camera);
     }
 
     public class Ray {
@@ -320,19 +320,18 @@ public class Main extends Application {
             return direction;
         }
     }
-    public void Render(WritableImage image) {
+    public void Render(WritableImage image, Camera camera) {
         // Get image dimensions, and declare loop variables
         int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
         PixelWriter image_writer = image.getPixelWriter();
 
-        Vector camera = new Vector(0, 0, -200);
         Vector light = new Vector(250, 250, -100 * lighty);
 
         for (j = 0; j < h; j++) {
             for (i = 0; i < w; i++) {
-                Vector direction = new Vector(i - w / 2, j - h / 2, 0).sub(camera);
+                Vector direction = new Vector(i - w / 2, j - h / 2, 0).sub(camera.getPosition());
                 direction.normalise();
-                Main.Ray ray = new Main.Ray(camera, direction);
+                Main.Ray ray = new Main.Ray(camera.getPosition(), direction);
 
                 Sphere.Intersection closest = null;
                 double closestDistance = Double.POSITIVE_INFINITY;
@@ -340,7 +339,7 @@ public class Main extends Application {
                 for (Sphere sphere : spheres) {
                     Sphere.Intersection current = sphere.intersect(ray);
                     if (current != null) {
-                        double distance = current.getPoint().sub(camera).magnitude();
+                        double distance = current.getPoint().sub(camera.getPosition()).magnitude();
                         if (distance < closestDistance) {
                             closest = current;
                             closestDistance = distance;
@@ -376,6 +375,5 @@ public class Main extends Application {
                 }
             }
         }
-    }
-    }
+    }}
 

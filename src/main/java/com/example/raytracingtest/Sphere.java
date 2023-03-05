@@ -5,14 +5,11 @@ public class Sphere {
     public Vector center;
     public double radius;
     public Color color;
-
     public Sphere(Vector center, double radius, Color color) {
         this.center = center;
         this.radius = radius;
         this.color = color;
     }
-
-
     public Intersection intersect(Main.Ray ray) {
         Vector oc = ray.getOrigin().sub(center);
         double a = ray.getDirection().dot(ray.getDirection());
@@ -35,8 +32,6 @@ public class Sphere {
             }
         }
     }
-
-
     public static class Intersection {
         public Vector point;
         public Vector normal;
