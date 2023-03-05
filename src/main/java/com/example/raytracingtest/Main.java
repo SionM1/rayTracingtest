@@ -41,12 +41,17 @@ public class Main extends Application {
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
 
+    Camera camera = new Camera(new Vector(0, 0, 0), 0, 0);
+
+
     //slider objects handler
+
     public static void setSliderTickLabels(Slider slider) {
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
         slider.setMajorTickUnit(10);
         slider.setMinorTickCount(0);
+
     }
 
     public void start(Stage stage) throws FileNotFoundException {
@@ -62,7 +67,7 @@ public class Main extends Application {
         spheres.add(new Sphere(new Vector(0, 55, -100), 25, Color.ORANGE));
 
         //select the first sphere
-        selectedSphere = spheres.get(0);
+        selectedSphere = spheres.get(1);
 
         // Create an image and an ImageView to display it
         WritableImage image = new WritableImage(Width, Height);
@@ -116,8 +121,14 @@ public class Main extends Application {
                 radius_slider.setValue(selectedSphere.radius);
             }
         });
-        //print out xyz coordinates when clicking on screen into terminal
+        //eventHandler
         view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+
+
+
+
+
+            //print out the X Y Z coordinates
             System.out.println(event.getX() + " " + event.getY());
             event.consume();
             Render(image);
@@ -218,7 +229,8 @@ public class Main extends Application {
         rgbSliderBox.getChildren().addAll(
                 new Label("R"), r_slider,
                 new Label("G"), g_slider,
-                new Label("B"), b_slider
+                new Label("B"), b_slider,
+                new Label("Radius"), radius_slider
         );
         // Create HBox to hold x, y, and z sliders
         HBox sliderBox = new HBox();
@@ -226,8 +238,8 @@ public class Main extends Application {
         sliderBox.getChildren().addAll(
                 new Label("X"), x_slider,
                 new Label("Y"), y_slider,
-                new Label("Z"), z_slider,
-                new Label("Radius"), radius_slider
+                new Label("Z"), z_slider
+
         );
 
         // Create a GridPane to hold the ImageView and sliders
@@ -246,7 +258,7 @@ public class Main extends Application {
 
 
         // Create a Scene and show it
-        Scene scene = new Scene(root, 1000, 640);
+        Scene scene = new Scene(root, 840, 640);
         stage.setScene(scene);
         stage.show();
 
@@ -255,8 +267,8 @@ public class Main extends Application {
     }
 
     public class Ray {
-        private Vector origin;
-        private Vector direction;
+        public Vector origin;
+        public Vector direction;
 
         public Ray(Vector origin, Vector direction) {
             this.origin = origin;

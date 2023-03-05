@@ -12,6 +12,7 @@ public class Sphere {
         this.color = color;
     }
 
+
     public Intersection intersect(Main.Ray ray) {
         Vector oc = ray.getOrigin().sub(center);
         double a = ray.getDirection().dot(ray.getDirection());
