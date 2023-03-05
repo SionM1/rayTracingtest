@@ -36,9 +36,6 @@ public class Sphere {
         }
     }
 
-    public Color getColor() {
-        return color;
-    }
 
     public static class Intersection {
         public Vector point;

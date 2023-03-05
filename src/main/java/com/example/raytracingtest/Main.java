@@ -41,11 +41,11 @@ public class Main extends Application {
     ArrayList<Sphere> spheres;
     Sphere selectedSphere;
 
-    Camera camera = new Camera(new Vector(0, 0, 0), 0, 0);
+    Camera camera = new Camera(new Vector(0, 0, 0), 0, 90);
+
 
 
     //slider objects handler
-
     public static void setSliderTickLabels(Slider slider) {
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
@@ -74,17 +74,23 @@ public class Main extends Application {
         ImageView view = new ImageView(image);
 
 
-        //sliders for x, y, z and radius
+        //sliders for x, y, z , radius and alt az
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
+        Slider azimuth_slider = new Slider(-180, 180, 0);
+        Slider altitude_slider = new Slider(-90, 90, 0);
         Slider radius_slider = new Slider(-200, 100, 0);
+
+
 
         //setting the tick labels on the sliders
         setSliderTickLabels(x_slider);
         setSliderTickLabels(y_slider);
         setSliderTickLabels(z_slider);
         setSliderTickLabels(radius_slider);
+        setSliderTickLabels(altitude_slider);
+        setSliderTickLabels(azimuth_slider);
         //rgb sliders
         Slider r_slider = new Slider(0, 1, selectedSphere.color.getRed());
         Slider g_slider = new Slider(0, 1, selectedSphere.color.getGreen());
@@ -105,8 +111,17 @@ public class Main extends Application {
             RadioButton rb = new RadioButton("Sphere " + (i + 1));
             rb.setToggleGroup(group);
             rb.setUserData(spheres.get(i));
-            vbox.getChildren().add(rb); // add RadioButton to the VBox
+            vbox.getChildren().add(rb);// add RadioButton to the VBox
+
         }
+        // Add Label and Slider controls outside of the loop
+        vbox.getChildren().addAll(
+                new Label("Azimuth:"),
+                azimuth_slider,
+                new Label("Altitude:"),
+                altitude_slider
+        );
+
         group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
                 // Update the selected sphere
@@ -123,9 +138,6 @@ public class Main extends Application {
         });
         //eventHandler
         view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
-
-
-
 
 
             //print out the X Y Z coordinates
@@ -223,6 +235,31 @@ public class Main extends Application {
                 }
             }
         });
+
+        // Add ChangeListeners for azimuth and altitude sliders
+        azimuth_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the azimuth of the camera
+                camera.setAzimuth(newValue.doubleValue());
+                // Render the image again
+                Render(image);
+                // Update the ImageView
+                view.setImage(image);
+            }
+        });
+
+        altitude_slider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // Update the altitude of the camera
+                camera.setAltitude(newValue.doubleValue());
+                // Render the image again
+                Render(image);
+                // Update the ImageView
+                view.setImage(image);
+            }
+        });
+
+
         //make a hbox to hold the RGB sliders
         HBox rgbSliderBox = new HBox();
         rgbSliderBox.setSpacing(10);

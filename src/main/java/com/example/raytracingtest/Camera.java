@@ -1,6 +1,6 @@
 package com.example.raytracingtest;
-
 public class Camera {
+
     private Vector position;
     private double azimuth;
     private double altitude;
@@ -39,7 +39,7 @@ public class Camera {
         double x = Math.sin(Math.toRadians(azimuth)) * Math.cos(Math.toRadians(altitude));
         double y = Math.sin(Math.toRadians(altitude));
         double z = Math.cos(Math.toRadians(azimuth)) * Math.cos(Math.toRadians(altitude));
-        return new Vector(x, y, z).normalize();
+        return new Vector(x, y, z).normalise();
     }
 
     public void moveForward(double distance) {
