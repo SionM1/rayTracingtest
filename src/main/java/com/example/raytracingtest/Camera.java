@@ -23,10 +23,6 @@ public class Camera {
         return altitude;
     }
 
-    public void setPosition(Vector position) {
-        this.position = position;
-    }
-
     public void setAzimuth(double azimuth) {
         this.azimuth = azimuth;
     }
@@ -34,25 +30,4 @@ public class Camera {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
-
-    public Vector getDirection() {
-        double x = Math.sin(Math.toRadians(azimuth)) * Math.cos(Math.toRadians(altitude));
-        double y = Math.sin(Math.toRadians(altitude));
-        double z = Math.cos(Math.toRadians(azimuth)) * Math.cos(Math.toRadians(altitude));
-        return new Vector(x, y, z).normalise();
-    }
-
-
-    public void rotateAzimuth(double angle) {
-        azimuth += angle;
-    }
-    public void rotateAltitude(double angle) {
-        altitude = angle;
-        if (altitude > 90) {
-            altitude = 90;
-        } else if (altitude < -90) {
-            altitude = -90;
-        }
-    }
-
 }
