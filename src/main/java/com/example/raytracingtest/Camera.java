@@ -2,8 +2,8 @@ package com.example.raytracingtest;
 public class Camera {
 
     private Vector position;
-    private double azimuth;
-    private double altitude;
+    double azimuth;
+    double altitude;
 
     public Camera(Vector position, double azimuth, double altitude) {
         this.position = position;
@@ -42,44 +42,17 @@ public class Camera {
         return new Vector(x, y, z).normalise();
     }
 
-    public void moveForward(double distance) {
-        Vector direction = getDirection();
-        position = position.add(direction.mul(distance));
-    }
-
-    public void moveBackward(double distance) {
-        Vector direction = getDirection();
-        position = position.sub(direction.mul(distance));
-    }
-
-    public void moveRight(double distance) {
-        Vector direction = getDirection().cross(new Vector(0, 1, 0)).normalise();
-        position = position.add(direction.mul(distance));
-    }
-
-    public void moveLeft(double distance) {
-        Vector direction = getDirection().cross(new Vector(0, 1, 0)).normalise();
-        position = position.sub(direction.mul(distance));
-    }
-
-    public void moveUp(double distance) {
-        position = position.add(new Vector(0, distance, 0));
-    }
-
-    public void moveDown(double distance) {
-        position = position.sub(new Vector(0, distance, 0));
-    }
 
     public void rotateAzimuth(double angle) {
         azimuth += angle;
     }
-
     public void rotateAltitude(double angle) {
-        altitude += angle;
+        altitude = angle;
         if (altitude > 90) {
             altitude = 90;
         } else if (altitude < -90) {
             altitude = -90;
         }
     }
+
 }

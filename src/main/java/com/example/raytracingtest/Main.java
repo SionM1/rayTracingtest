@@ -42,8 +42,8 @@ public class Main extends Application {
     Sphere selectedSphere;
 
     Camera camera = new Camera(new Vector(0, 0, -200), 0, 0);
-
-
+    double azimuth = camera.getAzimuth();
+    double altitude = camera.getAltitude();
 
     //slider objects handler
     public static void setSliderTickLabels(Slider slider) {
@@ -53,7 +53,6 @@ public class Main extends Application {
         slider.setMinorTickCount(0);
 
     }
-
     public void start(Stage stage) throws FileNotFoundException {
         stage.setTitle("Sphere!");
         int Width = 500;
@@ -78,8 +77,8 @@ public class Main extends Application {
         Slider x_slider = new Slider(-200, 200, 0);
         Slider y_slider = new Slider(-200, 200, 0);
         Slider z_slider = new Slider(-200, 0, -100);
-        Slider azimuth_slider = new Slider(-180, 180, 0);
-        Slider altitude_slider = new Slider(-90, 90, 0);
+        Slider azimuth_slider = new Slider(-180, 180, azimuth);
+        Slider altitude_slider = new Slider(-90, 90, altitude);
         Slider radius_slider = new Slider(-200, 100, 0);
 
 
@@ -136,10 +135,8 @@ public class Main extends Application {
                 radius_slider.setValue(selectedSphere.radius);
             }
         });
-        //eventHandler
+
         view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
-
-
             //print out the X Y Z coordinates
             System.out.println(event.getX() + " " + event.getY());
             event.consume();
@@ -239,23 +236,18 @@ public class Main extends Application {
         // Add ChangeListeners for azimuth and altitude sliders
         azimuth_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                // Update the azimuth of the camera
-                camera.setAzimuth(newValue.doubleValue());
-                // Render the image again
+                azimuth = newValue.doubleValue();
+                camera.setAzimuth(azimuth);
                 Render(image, camera);
-                // Update the ImageView
                 view.setImage(image);
             }
         });
-
         altitude_slider.valueProperty().addListener(new ChangeListener<Number>() {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                // Update the altitude of the camera
-                camera.setAltitude(newValue.doubleValue());
-                // Render the image again
+                altitude = newValue.doubleValue();
+                camera.setAltitude(altitude);
                 Render(image, camera);
-                // Update the ImageView
-                view.setImage((image));
+                view.setImage(image);
             }
         });
 
@@ -327,10 +319,21 @@ public class Main extends Application {
 
         Vector light = new Vector(250, 250, -100 * lighty);
 
+
+        double cosAzimuth = Math.cos(camera.getAzimuth());
+        double sinAzimuth = Math.sin(camera.getAzimuth());
+        double cosAltitude = Math.cos(camera.getAltitude());
+        double sinAltitude = Math.sin(camera.getAltitude());
+
         for (j = 0; j < h; j++) {
             for (i = 0; i < w; i++) {
-                Vector direction = new Vector(i - w / 2, j - h / 2, 0).sub(camera.getPosition());
+                Vector direction = new Vector(
+                        (i - w / 2) * cosAzimuth - (j - h / 2) * sinAzimuth,
+                        (i - w / 2) * sinAzimuth + (j - h / 2) * cosAzimuth,
+                        (j - h / 2) * cosAltitude + (i - w / 2) * sinAltitude
+                ).sub(camera.getPosition());
                 direction.normalise();
+
                 Main.Ray ray = new Main.Ray(camera.getPosition(), direction);
 
                 Sphere.Intersection closest = null;
@@ -374,6 +377,6 @@ public class Main extends Application {
                     image_writer.setColor(i, j, Color.GRAY);
                 }
             }
-        }
+     }
     }}
 
